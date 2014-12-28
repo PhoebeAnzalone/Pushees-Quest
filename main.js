@@ -19,12 +19,12 @@ var walls;
 
 function create() {
 	walls = game.add.group();
-	player = game.add.sprite(0, 0, 'pushee');
+	player = game.add.sprite(50, 50, 'pushee');
 
 	var newX = player.x;
 	var newY = player.y;
 
-	walls.create(50*4, 50*3, 'wall');
+	walls.create(50*6, 50*7, 'wall');
 
 	game.scale.setGameSize(player.width*16, player.height*8);
 
@@ -66,6 +66,27 @@ function update() {
 	if (!upKey.isDown && !downKey.isDown && !leftKey.isDown && !rightKey.isDown) {
 		keyIsDown = false;
 	}
+
+	if (newY < 0)
+	{
+		newY = game.height-player.height;
+	}
+
+	if (newY > game.height-player.height)
+	{
+		newY = 0;
+	}
+
+	if (newX < 0)
+	{
+		newX = game.width-player.width;
+	}
+
+	if (newX > game.width-player.width)
+	{
+		newX = 0;
+	}
+
 	if (!game.physics.arcade.getObjectsAtLocation(newX, newY, walls).length) {
 		player.x = newX;
 		player.y = newY;
