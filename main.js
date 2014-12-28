@@ -88,7 +88,11 @@ function update() {
 	}
 
 	if (!game.physics.arcade.getObjectsAtLocation(newX, newY, walls).length) {
-		player.x = newX;
-		player.y = newY;
+		if (newX != player.x || newY != player.y) {
+			walls.create(player.x, player.y, 'used');
+			game.physics.enable(walls, Phaser.Physics.ARCADE);
+			player.x = newX;
+			player.y = newY;
+		}
 	}
 }
