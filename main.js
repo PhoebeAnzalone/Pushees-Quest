@@ -5,6 +5,7 @@ function preload() {
 	game.load.image('wall',   'sprites/wall.png');
 	game.load.image('exit',   'sprites/exit.png');
 	game.load.image('used',   'sprites/used.png');
+	game.load.json('level1',   'levels/1.json');
 }
 
 var player;
@@ -19,25 +20,33 @@ var walls;
 
 function create() {
 	walls = game.add.group();
-	player = game.add.sprite(50, 50, 'pushee');
+
+	var level1 = game.cache.getJSON('level1');
+
+	player = game.add.sprite(0, 0, 'pushee');
+	player.x = level1.start[0]*player.width;
+	player.y = level1.start[1]*player.height;
 
 	var newX = player.x;
 	var newY = player.y;
-
-	walls.create(50*6, 50*7, 'wall');
 
 	game.scale.setGameSize(player.width*16, player.height*8);
 
 	game.stage.backgroundColor = '#FFFFFF';
 
 	game.physics.startSystem(Phaser.Physics.ARCADE);
-	game.physics.enable(walls, Phaser.Physics.ARCADE);
 	game.physics.enable(player, Phaser.Physics.ARCADE);
 
 	upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
 	downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
 	leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
 	rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+
+	level1.walls.forEach(function(w){
+		walls.create(w[0]*player.width, w[1]*player.height, 'wall');
+	});
+	exit = game.add.sprite(level1.exit[0]*player.width, level1.exit[1]*player.width, 'exit');
+	game.physics.enable(walls, Phaser.Physics.ARCADE);
 }
 
 function update() {
