@@ -6,6 +6,7 @@ function preload() {
 	game.load.image('exit',   'sprites/exit.png');
 	game.load.image('used',   'sprites/used.png');
 	game.load.json('level1',   'levels/1.json');
+	game.load.json('level2',   'levels/2.json');
 }
 
 var player;
@@ -75,33 +76,39 @@ function update() {
 	if (!upKey.isDown && !downKey.isDown && !leftKey.isDown && !rightKey.isDown) {
 		keyIsDown = false;
 	}
-
 	if (newY < 0)
 	{
 		newY = game.height-player.height;
 	}
-
 	if (newY > game.height-player.height)
 	{
 		newY = 0;
 	}
-
 	if (newX < 0)
 	{
 		newX = game.width-player.width;
 	}
-
 	if (newX > game.width-player.width)
 	{
 		newX = 0;
 	}
-
 	if (!game.physics.arcade.getObjectsAtLocation(newX, newY, walls).length) {
 		if (newX != player.x || newY != player.y) {
 			walls.create(player.x, player.y, 'used');
 			game.physics.enable(walls, Phaser.Physics.ARCADE);
 			player.x = newX;
 			player.y = newY;
+		}
+		if (walls.length==127) {
+
+		var level2 = game.cache.getJSON('level2');
+
+		level2.walls.forEach(function(w){
+			walls.create(w[0]*player.width, w[1]*player.height, 'wall');
+		});
+		exit = game.add.sprite(level2.exit[0]*player.width, level2.exit[1]*player.width, 'exit');
+		game.physics.enable(walls, Phaser.Physics.ARCADE);
+
 		}
 	}
 }
