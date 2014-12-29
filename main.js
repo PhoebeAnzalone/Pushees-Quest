@@ -7,31 +7,39 @@ function preload() {
 	game.load.image('used',   'sprites/used.png');
 	game.load.json('level1',   'levels/1.json');
 	game.load.json('level2',   'levels/2.json');
+	game.load.json('level3',   'levels/3.json');
 }
 
 var player;
-var keyIsDown;
+var newX;
+var newY;
+
+var walls;
 
 var upKey;
 var downKey;
 var leftKey;
 var rightKey;
 
-var walls;
+var keyIsDown;
+
+var rKey;
+
+var l = 0;
+
+var levelOrder =
+[
+'level1',
+'level2',
+'level3'
+];
 
 function create() {
-	walls = game.add.group();
-
-	var level1 = game.cache.getJSON('level1');
-
 	player = game.add.sprite(0, 0, 'pushee');
-	player.x = level1.start[0]*player.width;
-	player.y = level1.start[1]*player.height;
+	newX = player.x;
+	newY = player.y;
 
-	var newX = player.x;
-	var newY = player.y;
-
-	game.scale.setGameSize(player.width*16, player.height*8);
+	game.scale.setGameSize(16*player.width, 8*player.height);
 
 	game.stage.backgroundColor = '#FFFFFF';
 
@@ -43,11 +51,12 @@ function create() {
 	leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
 	rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
-	level1.walls.forEach(function(w){
-		walls.create(w[0]*player.width, w[1]*player.height, 'wall');
-	});
-	exit = game.add.sprite(level1.exit[0]*player.width, level1.exit[1]*player.width, 'exit');
-	game.physics.enable(walls, Phaser.Physics.ARCADE);
+	rKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
+
+	walls = game.add.group();
+	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
+
+	loadLevel(l);
 }
 
 function update() {
@@ -98,17 +107,28 @@ function update() {
 			game.physics.enable(walls, Phaser.Physics.ARCADE);
 			player.x = newX;
 			player.y = newY;
-		}
-		if (walls.length==127) {
-
-		var level2 = game.cache.getJSON('level2');
-
-		level2.walls.forEach(function(w){
-			walls.create(w[0]*player.width, w[1]*player.height, 'wall');
-		});
-		exit = game.add.sprite(level2.exit[0]*player.width, level2.exit[1]*player.width, 'exit');
-		game.physics.enable(walls, Phaser.Physics.ARCADE);
-
+			if (player.x==level.exit[0]*player.width && player.y==level.exit[1]*player.height) {
+				l++;
+				if (l>=levelOrder.length) {l=0;}
+				loadLevel(l);
+			}
 		}
 	}
+	if (rKey.isDown) {
+		loadLevel(l);
+	}
+}
+
+function loadLevel (l) {
+	level = game.cache.getJSON(levelOrder[l]);
+	walls.destroy();
+	walls = game.add.group();
+	player.x = level.start[0]*player.width;
+	player.y = level.start[1]*player.height;
+	level.walls.forEach(function(w){
+		walls.create(w[0]*player.width, w[1]*player.height, 'wall');
+	});
+	game.physics.enable(walls, Phaser.Physics.ARCADE);
+	exit.x = level.exit[0]*player.width;
+	exit.y = level.exit[1]*player.height
 }
