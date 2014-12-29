@@ -57,6 +57,8 @@ function create() {
 	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
 
 	loadLevel(l);
+
+game.input.onDown.add(beginSwipe, this);
 }
 
 function update() {
@@ -117,6 +119,10 @@ function update() {
 	if (rKey.isDown) {
 		loadLevel(l);
 	}
+	leftKey.isDown=0;
+	rightKey.isDown=0;
+	upKey.isDown=0;
+	downKey.isDown=0;
 }
 
 function loadLevel (l) {
@@ -125,10 +131,42 @@ function loadLevel (l) {
 	walls = game.add.group();
 	player.x = level.start[0]*player.width;
 	player.y = level.start[1]*player.height;
-	level.walls.forEach(function(w){
+	level.walls.forEach(function(w) {
 		walls.create(w[0]*player.width, w[1]*player.height, 'wall');
 	});
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
 	exit.x = level.exit[0]*player.width;
 	exit.y = level.exit[1]*player.height
+}
+
+function beginSwipe() {
+	startX = game.input.worldX;
+	startY = game.input.worldY;
+	game.input.onDown.remove(beginSwipe);
+	game.input.onUp.add(endSwipe);
+}
+
+function endSwipe() {
+	endX = game.input.worldX;
+	endY = game.input.worldY;
+	var distX = startX-endX;
+	var distY = startY-endY;
+	if(Math.abs(distX)>Math.abs(distY)*2 && Math.abs(distX)>10) {
+		if(distX>0) {
+			leftKey.isDown=1;
+		}
+		else {
+			rightKey.isDown=1;
+		}
+	}
+	if(Math.abs(distY)>Math.abs(distX)*2 && Math.abs(distY)>10) {
+		if(distY>0) {
+			upKey.isDown=1;
+		}
+		else {
+			downKey.isDown=1;
+		}
+	}
+	game.input.onDown.add(beginSwipe);
+	game.input.onUp.remove(endSwipe);
 }
