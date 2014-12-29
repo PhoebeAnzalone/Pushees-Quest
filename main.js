@@ -108,7 +108,7 @@ function update() {
 			player.x = newX;
 			player.y = newY;
 			if (player.x==level.exit[0]*player.width && player.y==level.exit[1]*player.height) {
-				l++;
+				if (walls.length>=127) {l++;}
 				if (l>=levelOrder.length) {l=0;}
 				loadLevel(l);
 			}
