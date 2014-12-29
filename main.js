@@ -40,7 +40,7 @@ function create() {
 	newY = player.y;
 
 	game.scale.setGameSize(16*player.width, 8*player.height);
-
+	game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
 	game.stage.backgroundColor = '#FFFFFF';
 
 	game.physics.startSystem(Phaser.Physics.ARCADE);
