@@ -30,6 +30,8 @@ var keyIsDown;
 
 var rKey;
 
+var pressed = 0;
+
 var l = 0;
 
 var levelOrder =
@@ -66,9 +68,10 @@ function create() {
 	walls = game.add.group();
 	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
 
-	loadLevel(l);
+	game.input.addPointer();
+	game.input.onDown.add(beginSwipe, this);
 
-game.input.onDown.add(beginSwipe, this);
+	loadLevel(l);
 }
 
 function update() {
@@ -119,9 +122,9 @@ function update() {
 			game.physics.enable(walls, Phaser.Physics.ARCADE);
 			player.x = newX;
 			player.y = newY;
-			if (player.x==level.exit[0]*player.width && player.y==level.exit[1]*player.height) {
-				if (walls.length>=127) {l++;}
-				if (l>=levelOrder.length) {l=0;}
+			if (player.x == level.exit[0]*player.width && player.y == level.exit[1]*player.height) {
+				if (walls.length >= 127) {l++;}
+				if (l >= levelOrder.length) {l = 0;}
 				loadLevel(l);
 			}
 		}
@@ -129,10 +132,11 @@ function update() {
 	if (rKey.isDown) {
 		loadLevel(l);
 	}
-	leftKey.isDown=0;
-	rightKey.isDown=0;
-	upKey.isDown=0;
-	downKey.isDown=0;
+	leftKey.isDown = 0;
+	rightKey.isDown = 0;
+	upKey.isDown = 0;
+	downKey.isDown = 0;
+	rKey.isDown = 0;
 }
 
 function loadLevel (l) {
@@ -150,6 +154,8 @@ function loadLevel (l) {
 }
 
 function beginSwipe() {
+	pressed++;
+	if (pressed > 2) {rKey.isDown = 1;}
 	startX = game.input.worldX;
 	startY = game.input.worldY;
 	game.input.onDown.remove(beginSwipe);
@@ -157,24 +163,25 @@ function beginSwipe() {
 }
 
 function endSwipe() {
+	pressed = 0;
 	endX = game.input.worldX;
 	endY = game.input.worldY;
 	var distX = startX-endX;
 	var distY = startY-endY;
-	if(Math.abs(distX)>Math.abs(distY)*2 && Math.abs(distX)>10) {
-		if(distX>0) {
-			leftKey.isDown=1;
+	if(Math.abs(distX) > Math.abs(distY)*2 && Math.abs(distX) > 10) {
+		if(distX > 0) {
+			leftKey.isDown = 1;
 		}
 		else {
-			rightKey.isDown=1;
+			rightKey.isDown = 1;
 		}
 	}
-	if(Math.abs(distY)>Math.abs(distX)*2 && Math.abs(distY)>10) {
-		if(distY>0) {
-			upKey.isDown=1;
+	if(Math.abs(distY) > Math.abs(distX)*2 && Math.abs(distY) > 10) {
+		if(distY > 0) {
+			upKey.isDown = 1;
 		}
 		else {
-			downKey.isDown=1;
+			downKey.isDown = 1;
 		}
 	}
 	game.input.onDown.add(beginSwipe);
