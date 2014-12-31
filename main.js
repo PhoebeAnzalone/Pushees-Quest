@@ -32,6 +32,10 @@ var rKey;
 
 var pressed = 0;
 
+var restart;
+
+var debugText;
+
 var l = 0;
 
 var levelOrder =
@@ -69,9 +73,15 @@ function create() {
 	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
 
 	game.input.addPointer();
-	game.input.onDown.add(beginSwipe, this);
+	game.input.onDown.add(beginSwipe);
+	game.input.onUp.add(endSwipe);
 
 	loadLevel(l);
+
+	//debugText = game.add.text(0, 0, "DEBUG", {
+	//font: "65px Arial",
+	//fill: "#ff0044"
+	//});
 }
 
 function update() {
@@ -80,25 +90,25 @@ function update() {
 	if (upKey.isDown && !keyIsDown)
 	{
 		newY = player.y - player.height;
-		keyIsDown = true;
+		keyIsDown = 1;
 	}
 	else if (downKey.isDown && !keyIsDown)
 	{
 		newY = player.y + player.height;
-		keyIsDown = true;
+		keyIsDown = 1;
 	}
 	else if (leftKey.isDown && !keyIsDown)
 	{
 		newX = player.x - player.width;
-		keyIsDown = true;
+		keyIsDown = 1;
 	}
 	else if (rightKey.isDown && !keyIsDown)
 	{
 		newX = player.x + player.width;
-		keyIsDown = true;
+		keyIsDown = 1;
 	}
 	if (!upKey.isDown && !downKey.isDown && !leftKey.isDown && !rightKey.isDown) {
-		keyIsDown = false;
+		keyIsDown = 0;
 	}
 	if (newY < 0)
 	{
@@ -132,14 +142,22 @@ function update() {
 	if (rKey.isDown) {
 		loadLevel(l);
 	}
+	releaseControls();
+
+	//debugText.setText(pressed);
+}
+
+function releaseControls () {
 	leftKey.isDown = 0;
 	rightKey.isDown = 0;
 	upKey.isDown = 0;
 	downKey.isDown = 0;
+	keyIsDown = 0;
 	rKey.isDown = 0;
 }
 
 function loadLevel (l) {
+	releaseControls();
 	level = game.cache.getJSON(levelOrder[l]);
 	walls.destroy();
 	walls = game.add.group();
@@ -155,15 +173,19 @@ function loadLevel (l) {
 
 function beginSwipe() {
 	pressed++;
-	if (pressed > 2) {rKey.isDown = 1;}
+	if (pressed == 3) {restart = 1;}
 	startX = game.input.worldX;
 	startY = game.input.worldY;
-	game.input.onDown.remove(beginSwipe);
-	game.input.onUp.add(endSwipe);
 }
 
 function endSwipe() {
-	pressed = 0;
+	pressed--;
+	if (pressed > 0) {return;}
+	if (restart == 1) {
+		restart = 0;
+		rKey.isDown = 1;
+		return;
+	}
 	endX = game.input.worldX;
 	endY = game.input.worldY;
 	var distX = startX-endX;
@@ -184,6 +206,4 @@ function endSwipe() {
 			downKey.isDown = 1;
 		}
 	}
-	game.input.onDown.add(beginSwipe);
-	game.input.onUp.remove(endSwipe);
 }
