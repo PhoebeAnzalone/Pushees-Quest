@@ -13,6 +13,7 @@ function preload() {
 	game.load.json('level6',   'levels/6.json');
 	game.load.json('level7',   'levels/7.json');
 	game.load.json('level8',   'levels/8.json');
+	game.load.json('level9',   'levels/9.json');
 }
 
 var player;
@@ -47,7 +48,8 @@ var levelOrder =
 'level5',
 'level6',
 'level7',
-'level8'
+'level8',
+'level9'
 ];
 
 function create() {
