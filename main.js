@@ -5,15 +5,6 @@ function preload() {
 	game.load.image('wall',   'sprites/wall.png');
 	game.load.image('exit',   'sprites/exit.png');
 	game.load.image('used',   'sprites/used.png');
-	game.load.json('level1',   'levels/1.json');
-	game.load.json('level2',   'levels/2.json');
-	game.load.json('level3',   'levels/3.json');
-	game.load.json('level4',   'levels/4.json');
-	game.load.json('level5',   'levels/5.json');
-	game.load.json('level6',   'levels/6.json');
-	game.load.json('level7',   'levels/7.json');
-	game.load.json('level8',   'levels/8.json');
-	game.load.json('level9',   'levels/9.json');
 }
 
 var player;
@@ -34,23 +25,6 @@ var rKey;
 var pressed = 0;
 
 var restart;
-
-var debugText;
-
-var l = 0;
-
-var levelOrder =
-[
-'level1',
-'level2',
-'level3',
-'level4',
-'level5',
-'level6',
-'level7',
-'level8',
-'level9'
-];
 
 function create() {
 	player = game.add.sprite(0, 0, 'pushee');
@@ -78,12 +52,7 @@ function create() {
 	game.input.onDown.add(beginSwipe);
 	game.input.onUp.add(endSwipe);
 
-	loadLevel(l);
-
-	//debugText = game.add.text(0, 0, "DEBUG", {
-	//font: "65px Arial",
-	//fill: "#ff0044"
-	//});
+	loadLevel();
 }
 
 function update() {
@@ -134,19 +103,16 @@ function update() {
 			game.physics.enable(walls, Phaser.Physics.ARCADE);
 			player.x = newX;
 			player.y = newY;
-			if (player.x == level.exit[0]*player.width && player.y == level.exit[1]*player.height) {
-				if (walls.length >= 127) {l++;}
-				if (l >= levelOrder.length) {l = 0;}
-				loadLevel(l);
+			if (player.x == exit.x && player.y == exit.y) {
+				//if (walls.length >= 127) {}
+				loadLevel();
 			}
 		}
 	}
 	if (rKey.isDown) {
-		loadLevel(l);
+		loadLevel();
 	}
 	releaseControls();
-
-	//debugText.setText(pressed);
 }
 
 function releaseControls () {
@@ -158,9 +124,11 @@ function releaseControls () {
 	rKey.isDown = 0;
 }
 
-function loadLevel (l) {
-	releaseControls();
-	level = game.cache.getJSON(levelOrder[l]);
+function loadLevel () {
+	level = location.hash.substring(1);
+	if (level == '') {return;}
+	level = decodeURIComponent(level);
+	level = JSON.parse(level);
 	walls.destroy();
 	walls = game.add.group();
 	player.x = level.start[0]*player.width;
@@ -170,7 +138,7 @@ function loadLevel (l) {
 	});
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
 	exit.x = level.exit[0]*player.width;
-	exit.y = level.exit[1]*player.height
+	exit.y = level.exit[1]*player.height;
 }
 
 function beginSwipe() {
