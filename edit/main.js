@@ -1,10 +1,12 @@
 var game = new Phaser.Game(1, 1, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
-	game.load.image('pushee', '../sprites/pushee.png');
-	game.load.image('wall',   '../sprites/wall.png');
-	game.load.image('exit',   '../sprites/exit.png');
-	game.load.image('used',   '../sprites/used.png');
+	game.load.image('blue',   '../sprites/blue.png');
+	game.load.image('red',   '../sprites/red.png');
+	game.load.image('lightgray',   '../sprites/lightgray.png');
+	game.load.image('darkgray',   '../sprites/darkgray.png');
+	game.load.image('black',   '../sprites/black.png');
+	game.load.image('white',   '../sprites/white.png');
 }
 
 var player;
@@ -31,14 +33,14 @@ var tempY;
 window.onhashchange = loadLevel;
 
 function create() {
-	player = game.add.sprite(0, 0, 'pushee');
+	player = game.add.sprite(0, 0, 'blue');
 
 	game.scale.setGameSize(16*player.width, 8*player.height);
 	game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
 	game.stage.backgroundColor = '#FFFFFF';
 
 	walls = game.add.group();
-	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
+	exit = game.add.sprite(15*player.width, 7*player.height, 'red');
 
 	game.input.addPointer();
 	game.input.onDown.add(beginSwipe);
@@ -60,7 +62,7 @@ function loadLevel () {
 	player.x = level.start[0]*player.width;
 	player.y = level.start[1]*player.height;
 	level.walls.forEach(function(w) {
-		walls.create(w[0]*player.width, w[1]*player.height, 'wall');
+		walls.create(w[0]*player.width, w[1]*player.height, 'black');
 	});
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
 	exit.x = level.exit[0]*player.width;
@@ -119,10 +121,10 @@ function endSwipe() {
 		game.physics.arcade.getObjectsAtLocation(startX, startY, walls).forEach(function(w) {
 			walls.remove(w);
 		});
-		walls.create(endX, endY, 'wall');
+		walls.create(endX, endY, 'black');
 	}
 	else if (!wallCheck) {
-		walls.create(endX, endY, 'wall');
+		walls.create(endX, endY, 'black');
 	}
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
 	saveLevel();

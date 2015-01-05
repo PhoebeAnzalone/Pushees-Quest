@@ -1,15 +1,25 @@
 var game = new Phaser.Game(1, 1, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
-	game.load.image('pushee', 'sprites/pushee.png');
-	game.load.image('wall',   'sprites/wall.png');
-	game.load.image('exit',   'sprites/exit.png');
-	game.load.image('used',   'sprites/used.png');
+	game.load.image('blue',   'sprites/blue.png');
+	game.load.image('red',   'sprites/red.png');
+	game.load.image('lightgray',   'sprites/lightgray.png');
+	game.load.image('darkgray',   'sprites/darkgray.png');
+	game.load.image('black',   'sprites/black.png');
+	game.load.image('white',   'sprites/white.png');
 }
 
 var player;
 var newX;
 var newY;
+
+var trailColors =
+[
+'lightgray',
+'darkgray'
+];
+
+var currentColor = 0;
 
 var walls;
 
@@ -27,7 +37,7 @@ var pressed = 0;
 var restart;
 
 function create() {
-	player = game.add.sprite(0, 0, 'pushee');
+	player = game.add.sprite(0, 0, 'blue');
 	newX = player.x;
 	newY = player.y;
 
@@ -46,7 +56,7 @@ function create() {
 	rKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
 
 	walls = game.add.group();
-	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
+	exit = game.add.sprite(15*player.width, 7*player.height, 'red');
 
 	game.input.addPointer();
 	game.input.onDown.add(beginSwipe);
@@ -99,7 +109,9 @@ function update() {
 	}
 	if (!game.physics.arcade.getObjectsAtLocation(newX, newY, walls).length) {
 		if (newX != player.x || newY != player.y) {
-			walls.create(player.x, player.y, 'used');
+			walls.create(player.x, player.y, trailColors[currentColor]);
+			currentColor++;
+			if (currentColor >= trailColors.length) {currentColor = 0;}
 			game.physics.enable(walls, Phaser.Physics.ARCADE);
 			player.x = newX;
 			player.y = newY;
@@ -133,8 +145,9 @@ function loadLevel () {
 	walls = game.add.group();
 	player.x = level.start[0]*player.width;
 	player.y = level.start[1]*player.height;
+	currentColor = 0;
 	level.walls.forEach(function(w) {
-		walls.create(w[0]*player.width, w[1]*player.height, 'wall');
+		walls.create(w[0]*player.width, w[1]*player.height, 'black');
 	});
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
 	exit.x = level.exit[0]*player.width;
