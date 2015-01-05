@@ -7,6 +7,10 @@ function preload() {
 	game.load.image('darkgray',   'sprites/darkgray.png');
 	game.load.image('black',   'sprites/black.png');
 	game.load.image('white',   'sprites/white.png');
+	game.load.image('pSprite',   'sprites/P.png');
+	game.load.image('xSprite',   'sprites/X.png');
+	game.load.image('asteriskSprite',   'sprites/asterisk.png');
+	game.load.image('oSprite',   'sprites/O.png');
 }
 
 var player;

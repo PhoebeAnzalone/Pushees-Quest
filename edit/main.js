@@ -3,10 +3,7 @@ var game = new Phaser.Game(1, 1, Phaser.AUTO, 'phaser-example', { preload: prelo
 function preload() {
 	game.load.image('blue',   '../sprites/blue.png');
 	game.load.image('red',   '../sprites/red.png');
-	game.load.image('lightgray',   '../sprites/lightgray.png');
-	game.load.image('darkgray',   '../sprites/darkgray.png');
 	game.load.image('black',   '../sprites/black.png');
-	game.load.image('white',   '../sprites/white.png');
 }
 
 var player;
