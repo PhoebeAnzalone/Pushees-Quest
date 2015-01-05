@@ -1,21 +1,33 @@
 var game = new Phaser.Game(1, 1, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
-	game.load.image('blue',   'sprites/blue.png');
-	game.load.image('red',   'sprites/red.png');
-	game.load.image('lightgray',   'sprites/lightgray.png');
-	game.load.image('darkgray',   'sprites/darkgray.png');
-	game.load.image('black',   'sprites/black.png');
-	game.load.image('white',   'sprites/white.png');
-	game.load.image('pSprite',   'sprites/P.png');
-	game.load.image('xSprite',   'sprites/X.png');
-	game.load.image('asteriskSprite',   'sprites/asterisk.png');
-	game.load.image('oSprite',   'sprites/O.png');
+	game.load.image('blue', 'sprites/blue.png');
+	game.load.image('red', 'sprites/red.png');
+	game.load.image('lightgray', 'sprites/lightgray.png');
+	game.load.image('darkgray', 'sprites/darkgray.png');
+	game.load.image('black', 'sprites/black.png');
+	game.load.image('white', 'sprites/white.png');
+	game.load.image('pSprite', 'sprites/P.png');
+	game.load.image('xSprite', 'sprites/X.png');
+	game.load.image('asteriskSprite', 'sprites/asterisk.png');
+	game.load.image('oSprite', 'sprites/O.png');
+	game.load.json('level1',   'levels/1.json');
+	game.load.json('level2',   'levels/2.json');
+	game.load.json('level3',   'levels/3.json');
+	game.load.json('level4',   'levels/4.json');
+	game.load.json('level5',   'levels/5.json');
+	game.load.json('level6',   'levels/6.json');
+	game.load.json('level7',   'levels/7.json');
+	game.load.json('level8',   'levels/8.json');
+	game.load.json('level9',   'levels/9.json');
 }
 
 var player;
+
 var newX;
 var newY;
+
+var level;
 
 var trailColors =
 [
@@ -42,6 +54,7 @@ var restart;
 
 function create() {
 	player = game.add.sprite(0, 0, 'blue');
+
 	newX = player.x;
 	newY = player.y;
 
@@ -59,13 +72,18 @@ function create() {
 
 	rKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
 
-	walls = game.add.group();
 	exit = game.add.sprite(15*player.width, 7*player.height, 'red');
+	walls = game.add.group();
 
 	game.input.addPointer();
 	game.input.onDown.add(beginSwipe);
 	game.input.onUp.add(endSwipe);
 
+	level = game.cache.getJSON('level1');
+	newLvlStr = JSON.stringify(level);
+	if (location.hash == '') {
+		location.hash = encodeURIComponent(newLvlStr);
+	}
 	loadLevel();
 }
 
@@ -120,7 +138,11 @@ function update() {
 			player.x = newX;
 			player.y = newY;
 			if (player.x == exit.x && player.y == exit.y) {
-				//if (walls.length >= 127) {}
+				if (walls.length >= 127) {
+					level = game.cache.getJSON(level.next);
+					newLvlStr = JSON.stringify(level);
+					location.hash = encodeURIComponent(newLvlStr);
+				}
 				loadLevel();
 			}
 		}
@@ -141,21 +163,27 @@ function releaseControls () {
 }
 
 function loadLevel () {
+	currentColor = 0;
+	walls.destroy();
+	walls = game.add.group();
+	player.x = 0;
+	player.y = 0;
+	exit.x = 15*player.width;
+	exit.y = 7*player.height;
+
 	level = location.hash.substring(1);
 	if (level == '') {return;}
 	level = decodeURIComponent(level);
 	level = JSON.parse(level);
-	walls.destroy();
-	walls = game.add.group();
+
 	player.x = level.start[0]*player.width;
 	player.y = level.start[1]*player.height;
-	currentColor = 0;
+	exit.x = level.exit[0]*player.width;
+	exit.y = level.exit[1]*player.height;
 	level.walls.forEach(function(w) {
 		walls.create(w[0]*player.width, w[1]*player.height, 'black');
 	});
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
-	exit.x = level.exit[0]*player.width;
-	exit.y = level.exit[1]*player.height;
 }
 
 function beginSwipe() {

@@ -131,6 +131,7 @@ function saveLevel() {
 	newLvl = {
 		start: [player.x/player.width, player.y/player.height],
 		exit: [exit.x/player.width, exit.y/player.height],
+		next: ['level1'],
 		walls: []
 	};
 	walls.children.forEach(function(w) {
