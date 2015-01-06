@@ -23,11 +23,21 @@ function preload() {
 }
 
 var player;
+var exit;
+var walls;
+
+var level;
+
+var pressed = 0;
+
+var startX;
+var startY;
+
+var endX;
+var endY;
 
 var newX;
 var newY;
-
-var level;
 
 var trailColors =
 [
@@ -37,8 +47,6 @@ var trailColors =
 
 var currentColor = 0;
 
-var walls;
-
 var upKey;
 var downKey;
 var leftKey;
@@ -47,10 +55,11 @@ var rightKey;
 var keyIsDown;
 
 var rKey;
-
-var pressed = 0;
+var pKey;
 
 var restart;
+
+window.onhashchange = loadLevel;
 
 function create() {
 	player = game.add.sprite(0, 0, 'blue');
@@ -71,6 +80,7 @@ function create() {
 	rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
 	rKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
+	pKey = game.input.keyboard.addKey(Phaser.Keyboard.P);
 
 	exit = game.add.sprite(15*player.width, 7*player.height, 'red');
 	walls = game.add.group();
@@ -84,6 +94,7 @@ function create() {
 	if (location.hash == '') {
 		location.hash = encodeURIComponent(newLvlStr);
 	}
+
 	loadLevel();
 }
 
@@ -139,9 +150,14 @@ function update() {
 			player.y = newY;
 			if (player.x == exit.x && player.y == exit.y) {
 				if (walls.length >= 127) {
+					if (level.next == 'editor') {
+						editLevel();
+					}
+					else {
 					level = game.cache.getJSON(level.next);
 					newLvlStr = JSON.stringify(level);
 					location.hash = encodeURIComponent(newLvlStr);
+					}
 				}
 				loadLevel();
 			}
@@ -149,6 +165,9 @@ function update() {
 	}
 	if (rKey.isDown) {
 		loadLevel();
+	}
+	if (pKey.isDown) {
+		editLevel();
 	}
 	releaseControls();
 }
@@ -160,6 +179,7 @@ function releaseControls () {
 	downKey.isDown = 0;
 	keyIsDown = 0;
 	rKey.isDown = 0;
+	pKey.isDown = 0;
 }
 
 function loadLevel () {
@@ -221,4 +241,8 @@ function endSwipe() {
 			downKey.isDown = 1;
 		}
 	}
+}
+
+function editLevel() {
+	location.pathname += 'edit';
 }

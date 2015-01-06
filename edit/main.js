@@ -1,8 +1,8 @@
 var game = new Phaser.Game(1, 1, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
-	game.load.image('blue',   '../sprites/blue.png');
-	game.load.image('red',   '../sprites/red.png');
+	game.load.image('start',   '../sprites/start.png');
+	game.load.image('exit',   '../sprites/exit.png');
 	game.load.image('black',   '../sprites/black.png');
 }
 
@@ -23,30 +23,43 @@ var startY;
 var endX;
 var endY;
 
+var pKey;
+
 var wallCheck;
 var tempX;
 var tempY;
 
+var newPathname;
+
 window.onhashchange = loadLevel;
 
 function create() {
-	player = game.add.sprite(0, 0, 'blue');
+	player = game.add.sprite(0, 0, 'start');
 
 	game.scale.setGameSize(16*player.width, 8*player.height);
 	game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
 	game.stage.backgroundColor = '#FFFFFF';
 
+	pKey = game.input.keyboard.addKey(Phaser.Keyboard.P);
+
+	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
 	walls = game.add.group();
-	exit = game.add.sprite(15*player.width, 7*player.height, 'red');
 
 	game.input.addPointer();
 	game.input.onDown.add(beginSwipe);
 	game.input.onUp.add(endSwipe);
 
+	if (location.hash == '') {
+		saveLevel();
+	}
+
 	loadLevel();
 }
 
 function update() {
+	if (pKey.isDown) {
+		testLevel();
+	}
 }
 
 function loadLevel () {
@@ -131,7 +144,7 @@ function saveLevel() {
 	newLvl = {
 		start: [player.x/player.width, player.y/player.height],
 		exit: [exit.x/player.width, exit.y/player.height],
-		next: ['level1'],
+		next: 'editor',
 		walls: []
 	};
 	walls.children.forEach(function(w) {
@@ -140,4 +153,10 @@ function saveLevel() {
 	newLvlStr = JSON.stringify(newLvl);
 
 	location.hash = encodeURIComponent(newLvlStr);
+}
+
+function testLevel() {
+	newPathname = location.pathname.substring(0, location.pathname.length - 1);
+	newPathname = newPathname.substring(0, newPathname.lastIndexOf('/') + 1);
+	location.pathname = newPathname;
 }
