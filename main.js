@@ -252,5 +252,5 @@ function endSwipe() {
 }
 
 function editLevel() {
-	location.pathname += 'edit';
+	location.pathname += 'edit/';
 }

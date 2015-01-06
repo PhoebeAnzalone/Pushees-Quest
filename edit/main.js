@@ -66,20 +66,26 @@ function update() {
 }
 
 function loadLevel () {
+	walls.destroy();
+	walls = game.add.group();
+	player.x = 0;
+	player.y = 0;
+	exit.x = 15*player.width;
+	exit.y = 7*player.height;
+
 	level = location.hash.substring(1);
 	if (level == '') {return;}
 	level = decodeURIComponent(level);
 	level = JSON.parse(level);
-	walls.destroy();
-	walls = game.add.group();
+
 	player.x = level.start[0]*player.width;
 	player.y = level.start[1]*player.height;
+	exit.x = level.exit[0]*player.width;
+	exit.y = level.exit[1]*player.height;
 	level.walls.forEach(function(w) {
 		walls.create(w[0]*player.width, w[1]*player.height, 'black');
 	});
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
-	exit.x = level.exit[0]*player.width;
-	exit.y = level.exit[1]*player.height;
 }
 
 function beginSwipe() {
