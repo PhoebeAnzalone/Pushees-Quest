@@ -65,7 +65,7 @@ function update() {
 	}
 }
 
-function loadLevel () {
+function loadLevel() {
 	walls.destroy();
 	walls = game.add.group();
 	player.x = 0;

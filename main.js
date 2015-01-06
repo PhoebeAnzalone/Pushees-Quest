@@ -22,6 +22,8 @@ function preload() {
 	game.load.json('level9',   'levels/9.json');
 }
 
+var classic = 0;
+
 var player;
 var exit;
 var walls;
@@ -63,7 +65,12 @@ var edit;
 window.onhashchange = loadLevel;
 
 function create() {
-	player = game.add.sprite(0, 0, 'blue');
+	if (!classic) {
+		player = game.add.sprite(0, 0, 'blue');
+	}
+	else {
+		player = game.add.sprite(0, 0, 'pSprite');
+	}
 
 	newX = player.x;
 	newY = player.y;
@@ -83,7 +90,12 @@ function create() {
 	rKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
 	pKey = game.input.keyboard.addKey(Phaser.Keyboard.P);
 
-	exit = game.add.sprite(15*player.width, 7*player.height, 'red');
+	if (!classic) {
+		exit = game.add.sprite(15*player.width, 7*player.height, 'red');
+	}
+	else {
+		exit = game.add.sprite(15*player.width, 7*player.height, 'xSprite');
+	}
 	walls = game.add.group();
 
 	game.input.addPointer();
@@ -144,7 +156,12 @@ function update() {
 	}
 	if (!game.physics.arcade.getObjectsAtLocation(newX, newY, walls).length) {
 		if (newX != player.x || newY != player.y) {
-			walls.create(player.x, player.y, trailColors[currentColor]);
+			if (!classic) {
+				walls.create(player.x, player.y, trailColors[currentColor]);
+			}
+			else {
+				walls.create(player.x, player.y, 'asteriskSprite');
+			}
 			currentColor++;
 			if (currentColor >= trailColors.length) {currentColor = 0;}
 			game.physics.enable(walls, Phaser.Physics.ARCADE);
@@ -174,7 +191,7 @@ function update() {
 	releaseControls();
 }
 
-function releaseControls () {
+function releaseControls() {
 	leftKey.isDown = 0;
 	rightKey.isDown = 0;
 	upKey.isDown = 0;
@@ -184,7 +201,7 @@ function releaseControls () {
 	pKey.isDown = 0;
 }
 
-function loadLevel () {
+function loadLevel() {
 	currentColor = 0;
 	walls.destroy();
 	walls = game.add.group();
@@ -203,7 +220,12 @@ function loadLevel () {
 	exit.x = level.exit[0]*player.width;
 	exit.y = level.exit[1]*player.height;
 	level.walls.forEach(function(w) {
-		walls.create(w[0]*player.width, w[1]*player.height, 'black');
+		if (!classic) {
+			walls.create(w[0]*player.width, w[1]*player.height, 'black');
+		}
+		else {
+			walls.create(w[0]*player.width, w[1]*player.height, 'oSprite');
+		}
 	});
 	game.physics.enable(walls, Phaser.Physics.ARCADE);
 }
