@@ -25,6 +25,8 @@ var endY;
 
 var pKey;
 
+var test;
+
 var wallCheck;
 var tempX;
 var tempY;
@@ -45,6 +47,7 @@ function create() {
 	exit = game.add.sprite(15*player.width, 7*player.height, 'exit');
 	walls = game.add.group();
 
+	game.input.addPointer();
 	game.input.addPointer();
 	game.input.onDown.add(beginSwipe);
 	game.input.onUp.add(endSwipe);
@@ -80,11 +83,20 @@ function loadLevel () {
 }
 
 function beginSwipe() {
+	pressed++;
+	if (pressed == 4) {test = 1;}
 	startX = parseInt(game.input.worldX/player.width)*player.width;
 	startY = parseInt(game.input.worldY/player.height)*player.height;
 }
 
 function endSwipe() {
+	pressed--;
+	if (pressed > 0) {return;}
+	if (test == 1) {
+		test = 0;
+		pKey.isDown = 1;
+		return;
+	}
 	wallCheck = 0;
 	endX = parseInt(game.input.worldX/player.width)*player.width;
 	endY = parseInt(game.input.worldY/player.height)*player.height;

@@ -58,6 +58,7 @@ var rKey;
 var pKey;
 
 var restart;
+var edit;
 
 window.onhashchange = loadLevel;
 
@@ -85,6 +86,7 @@ function create() {
 	exit = game.add.sprite(15*player.width, 7*player.height, 'red');
 	walls = game.add.group();
 
+	game.input.addPointer();
 	game.input.addPointer();
 	game.input.onDown.add(beginSwipe);
 	game.input.onUp.add(endSwipe);
@@ -209,6 +211,7 @@ function loadLevel () {
 function beginSwipe() {
 	pressed++;
 	if (pressed == 3) {restart = 1;}
+	if (pressed == 4) {restart = 0; edit = 1;}
 	startX = game.input.worldX;
 	startY = game.input.worldY;
 }
@@ -219,6 +222,11 @@ function endSwipe() {
 	if (restart == 1) {
 		restart = 0;
 		rKey.isDown = 1;
+		return;
+	}
+	if (edit == 1) {
+		edit = 0;
+		pKey.isDown = 1;
 		return;
 	}
 	endX = game.input.worldX;
