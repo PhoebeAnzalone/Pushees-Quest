@@ -16,6 +16,7 @@ var newLvl;
 var newLvlStr;
 
 var pressed = 0;
+var pressedMax = 0;
 
 var startX;
 var startY;
@@ -57,12 +58,18 @@ function create() {
 	}
 
 	loadLevel();
+
+	//debugText = game.add.text(0, 0, "DEBUG", {
+	//font: "26px Arial",
+	//fill: "#ff0044"
+	//});
 }
 
 function update() {
 	if (pKey.isDown) {
 		testLevel();
 	}
+	//debugText.setText("pressed: " + pressed + "\npressedMax: " + pressedMax);
 }
 
 function loadLevel() {
@@ -90,14 +97,16 @@ function loadLevel() {
 
 function beginSwipe() {
 	pressed++;
-	if (pressed == 4) {test = 1;}
 	startX = parseInt(game.input.worldX/player.width)*player.width;
 	startY = parseInt(game.input.worldY/player.height)*player.height;
+	if (pressed >= pressedMax) {pressedMax = pressed;}
+	if (pressedMax == 4) {test = 1;}
 }
 
 function endSwipe() {
 	pressed--;
 	if (pressed > 0) {return;}
+	pressedMax = 0;
 	if (test == 1) {
 		test = 0;
 		pKey.isDown = 1;

@@ -31,6 +31,7 @@ var walls;
 var level;
 
 var pressed = 0;
+var pressedMax = 0;
 
 var startX;
 var startY;
@@ -110,6 +111,11 @@ function create() {
 	}
 
 	loadLevel();
+
+	//debugText = game.add.text(0, 0, "DEBUG", {
+	//font: "26px Arial",
+	//fill: "#ff0044"
+	//});
 }
 
 function update() {
@@ -189,6 +195,8 @@ function update() {
 		editLevel();
 	}
 	releaseControls();
+
+	//debugText.setText("pressed: " + pressed + "\npressedMax: " + pressedMax);
 }
 
 function releaseControls() {
@@ -232,15 +240,17 @@ function loadLevel() {
 
 function beginSwipe() {
 	pressed++;
-	if (pressed == 3) {restart = 1;}
-	if (pressed == 4) {restart = 0; edit = 1;}
 	startX = game.input.worldX;
 	startY = game.input.worldY;
+	if (pressed >= pressedMax) {pressedMax = pressed;}
+	if (pressedMax == 3) {restart = 1;}
+	if (pressedMax == 4) {restart = 0; edit = 1;}
 }
 
 function endSwipe() {
 	pressed--;
 	if (pressed > 0) {return;}
+	pressedMax = 0;
 	if (restart == 1) {
 		restart = 0;
 		rKey.isDown = 1;
