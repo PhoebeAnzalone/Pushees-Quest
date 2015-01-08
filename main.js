@@ -1,5 +1,9 @@
 var game = new Phaser.Game(1, 1, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
+function randInt(min, max) {
+return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function preload() {
 	game.load.image('blue', 'sprites/blue.png');
 	game.load.image('red', 'sprites/red.png');
@@ -30,8 +34,21 @@ var walls;
 
 var level;
 
+var newLvlStr;
+
+var path;
+
+var pathCollision = 0;
+
+var pathX;
+var pathY;
+
+var newPathX;
+var newPathY;
+
 var pressed = 0;
 var pressedMax = 0;
+var pressedTotal = 0;
 
 var startX;
 var startY;
@@ -62,8 +79,6 @@ var pKey;
 
 var restart;
 var edit;
-
-window.onhashchange = loadLevel;
 
 function create() {
 	if (!classic) {
@@ -104,18 +119,18 @@ function create() {
 	game.input.onDown.add(beginSwipe);
 	game.input.onUp.add(endSwipe);
 
+	if (location.hash == '#random') {
+		createRandomLevel();
+	}
+
 	level = game.cache.getJSON('level1');
 	newLvlStr = JSON.stringify(level);
+
 	if (location.hash == '') {
 		location.hash = encodeURIComponent(newLvlStr);
 	}
 
 	loadLevel();
-
-	//debugText = game.add.text(0, 0, "DEBUG", {
-	//font: "26px Arial",
-	//fill: "#ff0044"
-	//});
 }
 
 function update() {
@@ -178,6 +193,9 @@ function update() {
 					if (level.next == 'editor') {
 						editLevel();
 					}
+					else if (level.next == 'random') {
+						createRandomLevel();
+					}
 					else {
 					level = game.cache.getJSON(level.next);
 					newLvlStr = JSON.stringify(level);
@@ -195,8 +213,6 @@ function update() {
 		editLevel();
 	}
 	releaseControls();
-
-	//debugText.setText("pressed: " + pressed + "\npressedMax: " + pressedMax);
 }
 
 function releaseControls() {
@@ -240,6 +256,7 @@ function loadLevel() {
 
 function beginSwipe() {
 	pressed++;
+	pressedTotal++;
 	startX = game.input.worldX;
 	startY = game.input.worldY;
 	if (pressed >= pressedMax) {pressedMax = pressed;}
@@ -251,6 +268,7 @@ function endSwipe() {
 	pressed--;
 	if (pressed > 0) {return;}
 	pressedMax = 0;
+	pressedTotal = 0;
 	if (restart == 1) {
 		restart = 0;
 		rKey.isDown = 1;
@@ -285,4 +303,67 @@ function endSwipe() {
 
 function editLevel() {
 	location.pathname += 'edit/';
+}
+
+function createRandomLevel() {
+	level = {
+		start: [],
+		exit: [],
+		next: 'random',
+		walls: []
+	};
+	pathX = randInt(0,15);
+	pathY = randInt(0,7);
+	for (i = 0; i < 255; i++) {
+		newPathX = pathX;
+		newPathY = pathY;
+		switch(randInt(0,3)) {
+			default:
+			case 0:
+			newPathX++;
+			break;
+
+			case 1:
+			newPathX--;
+			break;
+
+			case 2:
+			newPathY++;
+			break;
+
+			case 3:
+			newPathY--;
+			break;
+		}
+		if (newPathX > 15) {newPathX = 0;}
+		if (newPathX < 0) {newPathX = 15;}
+		if (newPathY > 7) {newPathY = 0;}
+		if (newPathY < 0) {newPathY = 7;}
+		level.walls.forEach(function(w) {
+			if (newPathX == w[0] && newPathY == w[1]) {pathCollision = 1;}
+		});
+		if (!pathCollision) {
+			pathX = newPathX;
+			pathY = newPathY;
+			level.walls.push([pathX, pathY]);
+		}
+		pathCollision = 0;
+	}
+	path = level.walls;
+	level.start = level.walls[0];
+	level.exit = level.walls[level.walls.length - 1];
+	level.walls = [];
+	for (j = 0; j <= 15; j++) {
+		for (s = 0; s <= 7; s++) {
+			path.forEach(function(w) {
+				if (j == w[0] && s == w[1]) {pathCollision = 1;}
+			});
+			if (!pathCollision) {
+				level.walls.push([j, s]);
+			}
+			pathCollision = 0;
+		}
+	}
+	newLvlStr = JSON.stringify(level);
+	location.hash = encodeURIComponent(newLvlStr);
 }

@@ -58,18 +58,17 @@ function create() {
 	}
 
 	loadLevel();
-
-	//debugText = game.add.text(0, 0, "DEBUG", {
-	//font: "26px Arial",
-	//fill: "#ff0044"
-	//});
 }
 
 function update() {
 	if (pKey.isDown) {
 		testLevel();
 	}
-	//debugText.setText("pressed: " + pressed + "\npressedMax: " + pressedMax);
+	releaseControls();
+}
+
+function releaseControls() {
+	pKey.isDown = 0;
 }
 
 function loadLevel() {
